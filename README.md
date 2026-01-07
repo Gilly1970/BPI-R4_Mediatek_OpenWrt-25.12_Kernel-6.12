@@ -29,6 +29,7 @@ u-boot-tools dos2unix
 1. **Clone repo**:
    * Clone repo:
      `git clone https://github.com/Gilly1970/BPI-R4_Mediatek_OpenWrt-25.12_Kernel-6.12.git`
+     
    * Update permissions:
      `sudo chmod 775 -R BPI-R4_Mediatek_OpenWrt-25.12_Kernel-6.12`
 
