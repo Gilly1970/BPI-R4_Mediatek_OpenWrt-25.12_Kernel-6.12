@@ -24,7 +24,20 @@ gcc-multilib g++-multilib gettext git libncurses-dev libssl-dev \
 python3-distutils python3-setuptools rsync swig unzip zlib1g-dev file wget \
 u-boot-tools dos2unix
 ```
----
+## **How to Use**
+
+1. **Clone repo**:
+```
+   git clone https://github.com/Gilly1970/BPI-R4_Mediatek_OpenWrt-25.12_Kernel-6.12.git
+   sudo chmod 775 -R BPI-R4_Mediatek_OpenWrt-25.12_Kernel-6.12
+```
+
+2. **Run the Script**:  
+   * Make the script executable:  
+     `chmod +x mtk-openwrt_25.12_build.sh`
+     
+   * Execute the script:  
+     `./mtk-openwrt_25.12_build.sh`
 
 #### Filogic 880/850 WiFi7 4.3 Alpha Release (2025-12-31)
 
