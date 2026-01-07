@@ -1,0 +1,1 @@
+# BPI-R4_Mediatek_OpenWrt-25.12_Kernel-6.12
