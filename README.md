@@ -46,7 +46,8 @@ Please note - this build is for testing the Alpha Release which may contain bugs
 
 ## **Notes**
 
-To adjust the tx power values you also need to add sku_idx '0' to your wireless config
+> [!NOTE]
+>To adjust the tx power values you also need to add sku_idx '0' to your wireless config
 ```
 config wifi-device 'radio0'
 
