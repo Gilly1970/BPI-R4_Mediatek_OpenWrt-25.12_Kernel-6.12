@@ -40,7 +40,7 @@ u-boot-tools dos2unix
    * Execute the script:  
      `./mtk-openwrt_25.12_build.sh`
 
-#### Filogic 880/850 WiFi7 4.3 Alpha Release (2025-12-31)
+## **Filogic 880/850 WiFi7 4.3 Alpha Release (2025-12-31)**
 
 Please note - this build is for testing the Alpha Release which may contain bugs. If you want stability use Openwrt 24.10 instead.
 
