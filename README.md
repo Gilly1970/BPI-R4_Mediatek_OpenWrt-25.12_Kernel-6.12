@@ -45,6 +45,9 @@ u-boot-tools dos2unix
 >This build is for testing the Alpha Release which may contain bugs so if you want stability please use Openwrt 24.10 instead.
 > 
 > Currently no SDcard.img is created with this build. MediaTek's new boot flow (using FIP/U-Boot 2024.x) which relies heavily on the FIT images (.itb) for both recovery and system upgrade, effectively deprecating the old "raw SD card image" method for this specific branch. If you haven't updated to MediaTek's u-boot then you will need to force update using "openwrt-mediatek-filogic-bananapi_bpi-r4-squashfs-sysupgrade.itb" to upgrade.
+<img width="597" height="540" alt="force update" src="https://github.com/user-attachments/assets/2af6f8fa-2f30-4421-be0e-2415ea2268c2" />
+
+> 
 
 ## **Notes**
 
