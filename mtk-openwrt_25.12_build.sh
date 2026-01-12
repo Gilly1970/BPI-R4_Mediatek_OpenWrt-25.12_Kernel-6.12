@@ -7,12 +7,12 @@ set -euo pipefail
 
 # --- Main Configuration ---
 readonly OPENWRT_REPO="https://git.openwrt.org/openwrt/openwrt.git"
-#readonly OPENWRT_REPO="/home/user/repo/25.12/openwrt"
+#readonly OPENWRT_REPO="/home/user/repo/openwrt"
 readonly OPENWRT_BRANCH="openwrt-25.12"
 readonly OPENWRT_COMMIT="" 
 
 readonly MTK_FEEDS_REPO="https://git01.mediatek.com/openwrt/feeds/mtk-openwrt-feeds"
-#readonly MTK_FEEDS_REPO="/home/user/repo/25.12/mtk-openwrt-feeds"
+#readonly MTK_FEEDS_REPO="/home/user/repo/mtk-openwrt-feeds"
 readonly MTK_FEEDS_BRANCH="master"
 readonly MTK_FEEDS_COMMIT="" 
 
@@ -40,37 +40,22 @@ log() {
     echo "[$(date +'%Y-%m-%d %H:%M:%S')] - $1" >&2
 }
 
-# UPDATED: comprehensive dependency checker
 check_dependencies() {
     log "--- Checking System Dependencies ---"
     local missing=0
-    
-    # Map commands to their Ubuntu package names
-    # Syntax: ["command_name"]="package_name"
     declare -A tools=( 
-        ["git"]="git"
-        ["make"]="build-essential"
-        ["awk"]="gawk"
-        ["dos2unix"]="dos2unix" 
-        ["rsync"]="rsync" 
-        ["patch"]="patch"
-        ["mkimage"]="u-boot-tools"
-        ["dtc"]="device-tree-compiler"
+        ["git"]="git" ["make"]="build-essential" ["awk"]="gawk"
+        ["dos2unix"]="dos2unix" ["rsync"]="rsync" ["patch"]="patch"
+        ["mkimage"]="u-boot-tools" ["dtc"]="device-tree-compiler"
         ["python3"]="python3"
     )
-
     for cmd in "${!tools[@]}"; do
         if ! command -v "$cmd" &> /dev/null; then
-            log "ERROR: Command '$cmd' not found. Please install package '${tools[$cmd]}'."
+            log "ERROR: Command '$cmd' not found. Please install '${tools[$cmd]}'."
             missing=1
         fi
     done
-    
-    if [ "$missing" -eq 1 ]; then
-        log "CRITICAL: One or more dependencies are missing. Script cannot proceed."
-        log "Tip: Run 'sudo apt update && sudo apt install ${tools[*]}'"
-        exit 1
-    fi
+    if [ "$missing" -eq 1 ]; then exit 1; fi
     log "All dependencies met."
 }
 
@@ -88,10 +73,7 @@ setup_repo() {
     local branch=$2
     local commit_hash=$3
     local target_dir=$4
-    
-    if [ -d "$target_dir" ]; then
-        rm -rf "$target_dir"
-    fi
+    if [ -d "$target_dir" ]; then rm -rf "$target_dir"; fi
     git clone --branch "$branch" "$repo_url" "$target_dir"
     (cd "$target_dir" && git checkout "$commit_hash")
 }
@@ -162,11 +144,13 @@ copy_custom_files() {
 configure_build() {
     local defconfig_src="$SOURCE_DEFAULT_CONFIG_DIR/defconfig"
     local defconfig_dest="$MTK_FEEDS_DIR/autobuild/unified/filogic/25.12/"
+    
     if [ -f "$defconfig_src" ]; then
         log "Applying custom defconfig..."
         mkdir -p "$defconfig_dest"
         cp "$defconfig_src" "$defconfig_dest"
     fi
+    
 }
 
 create_feed_revision() {
@@ -178,10 +162,7 @@ create_feed_revision() {
         local line
         line=$(grep -E "^src-.* $feed_name " "$openwrt_feeds" | head -n 1)
         if [ -z "$line" ]; then return 1; fi
-        if [[ "$line" == *"^"* ]]; then
-            echo "$line" | cut -d'^' -f2
-            return 0
-        fi
+        if [[ "$line" == *"^"* ]]; then echo "$line" | cut -d'^' -f2; return 0; fi
         if [[ "$line" == *";"* ]]; then
             local url branch resolved_hash
             url=$(echo "$line" | awk '{print $3}' | cut -d';' -f1)
@@ -193,30 +174,40 @@ create_feed_revision() {
     }
 
     > "$mtk_revision_file"
-    for feed in luci routing packages; do
-        hash=$(get_exact_hash "$feed")
-        [ -n "$hash" ] && echo "$feed $hash" >> "$mtk_revision_file"
+    
+    log "--- Syncing Feed Revisions ---"
+    awk '{print $2}' "$openwrt_feeds" | while read -r feed_name; do
+        [[ -z "$feed_name" || "$feed_name" == "mtk" ]] && continue
+        
+        hash=$(get_exact_hash "$feed_name")
+        if [ -n "$hash" ]; then
+            echo "$feed_name $hash" >> "$mtk_revision_file"
+            log "  - Locked $feed_name to $hash"
+        else
+            log "  - Warning: Could not find hash for $feed_name"
+        fi
     done
 }
 
 rename_release_images() {
     local release_dir="$OPENWRT_DIR/autobuild_release"
+    log "--- Renaming Release Images (Removing Timestamps) ---"
     
     if [ ! -d "$release_dir" ]; then
         log "Warning: Release directory '$release_dir' not found. Renaming skipped."
         return
     fi
 
-    # Rename Sysupgrade
     find "$release_dir" -name "*bananapi_bpi-r4-squashfs-sysupgrade*.itb" -print0 | while IFS= read -r -d '' file; do
         local new_name="$release_dir/openwrt-mediatek-filogic-bananapi_bpi-r4-squashfs-sysupgrade.itb"
         mv "$file" "$new_name"
+        log "Renamed: $(basename "$file") -> $(basename "$new_name")"
     done
 
-    # Rename Recovery
     find "$release_dir" -name "*bananapi_bpi-r4-initramfs-recovery*.itb" -print0 | while IFS= read -r -d '' file; do
         local new_name="$release_dir/openwrt-mediatek-filogic-bananapi_bpi-r4-initramfs-recovery.itb"
         mv "$file" "$new_name"
+        log "Renamed: $(basename "$file") -> $(basename "$new_name")"
     done
 }
 
@@ -232,7 +223,6 @@ prompt_for_custom_build() {
 }
 
 main() {
-    # 1. Full Dependency Check
     check_dependencies
     
     openwrt_commit=$( [ -n "$OPENWRT_COMMIT" ] && echo "$OPENWRT_COMMIT" || get_latest_commit_hash "$OPENWRT_REPO" "$OPENWRT_BRANCH" )
@@ -268,7 +258,10 @@ main() {
         sed -i 's/\${.*_rfb.*}_nic_set=yes/true/' "$AUTOBUILD_SCRIPT" || true
     fi
 
-    log "--- Cleaning Previous Build State ---"
+    log "--- Forcing Fresh Feed State ---"
+    rm -rf "$OPENWRT_DIR/feeds" "$OPENWRT_DIR/package/feeds"
+
+    log "--- Cleaning Autobuild Cache ---"
     (
         cd "$OPENWRT_DIR"
         bash "../$MTK_FEEDS_DIR/autobuild/unified/autobuild.sh" "$BUILD_PROFILE" clean
