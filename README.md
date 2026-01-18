@@ -17,13 +17,13 @@ Script to Build (Openwrt 25.12/kernel 6.12) with the mtk-openwrt-feeds...
 ##### Toolchain
 
 - Installs essential development tools and libraries, including compilers, build tools. Please refer to https://openwrt.org/docs/guide-developer/toolchain/install-buildsystem for more detail
-```csharp
-sudo apt update
-sudo apt install build-essential clang flex bison g++ gawk \
-gcc-multilib g++-multilib gettext git libncurses-dev libssl-dev \
-python3-distutils python3-setuptools rsync swig unzip zlib1g-dev file wget \
-u-boot-tools dos2unix
-```
+     ```csharp
+     sudo apt update
+     sudo apt install build-essential clang flex bison g++ gawk \
+     gcc-multilib g++-multilib gettext git libncurses-dev libssl-dev \
+     python3-distutils python3-setuptools rsync swig unzip zlib1g-dev file wget \
+     u-boot-tools dos2unix
+     ```
 ## **How to Use**
 
 1. **Clone repo**:
