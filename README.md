@@ -60,10 +60,13 @@ To resolve this, you have two options:
 
 To check MediaTek patches releases - https://git01.mediatek.com/plugins/gitiles/openwrt/feeds/mtk-openwrt-feeds/+log
 
+To check MediaTek patches releases - https://git.openwrt.org/?p=openwrt/openwrt.git;a=shortlog;h=refs/heads/openwrt-25.12
+
 ## **Notes**
 > [!NOTE]
-> Currently no bananapi_bpi-r4-sdcard.img.gz is created with this build. MediaTek's new boot flow (using FIP/U-Boot 2024.x) which relies heavily on the FIT images (.itb) for both recovery and system upgrade, effectively deprecating the old "raw SD card image" method for this specific branch. If you haven't updated to MediaTek's u-boot then you will need to force update using "openwrt-mediatek-filogic-bananapi_bpi-r4-squashfs-sysupgrade.itb" to upgrade.
-<img width="597" height="540" alt="force update" src="https://github.com/user-attachments/assets/2af6f8fa-2f30-4421-be0e-2415ea2268c2" />
+> 18.01.2026 - Add `bananapi_bpi-r4-sdcard.img.gz` to the build. All images can be found in the `openwrt/bin/targets/mediatek/filogic` folder.
+
+<img width="1193" height="487" alt="OpenWrt_V2" src="https://github.com/user-attachments/assets/0ee26b12-d203-480c-b65c-0b8abbf3128f" />
 
 > [!NOTE]
 >Temp removing '999-ppe-29-netfilter-add-xfrm-offload.patch' and 3 other related patches to fix compile error 'struct dst_entry has no member named xfrm'. This patch tries to add code that accesses dst->xfrm. Since OpenWrt 25.12 (Kernel 6.12) has removed or currently refactored that member from the kernel structure, applying this patch breaks the networking stack compilation.
