@@ -17,7 +17,7 @@ Script to Build (Openwrt 25.12/kernel 6.12) with the mtk-openwrt-feeds...
 ##### Toolchain
 
 - Installs essential development tools and libraries, including compilers, build tools. Please refer to https://openwrt.org/docs/guide-developer/toolchain/install-buildsystem for more detail
-```
+```csharp
 sudo apt update
 sudo apt install build-essential clang flex bison g++ gawk \
 gcc-multilib g++-multilib gettext git libncurses-dev libssl-dev \
@@ -27,18 +27,25 @@ u-boot-tools dos2unix
 ## **How to Use**
 
 1. **Clone repo**:
-   * Clone repo:   
-     `git clone https://github.com/Gilly1970/BPI-R4_Mediatek_OpenWrt-25.12_Kernel-6.12.git`
-     
-   * Update permissions:   
-     `sudo chmod 775 -R BPI-R4_Mediatek_OpenWrt-25.12_Kernel-6.12`
+   * Clone repo: 
+     ```csharp
+     git clone https://github.com/Gilly1970/BPI-R4_Mediatek_OpenWrt-25.12_Kernel-6.12.git
+     ```
+   * Update permissions: 
+     ```csharp
+     sudo chmod 775 -R BPI-R4_Mediatek_OpenWrt-25.12_Kernel-6.12
+     ```
 
 2. **Run the Script**:  
-   * Make the script executable:  
-     `chmod +x mtk-openwrt_25.12_build.sh`
+   * Make the script executable:
+     ```csharp
+     chmod +x mtk-openwrt_25.12_build.sh
+	 ```
      
-   * Execute the script:  
-     `./mtk-openwrt_25.12_build.sh`
+   * Execute the script: 
+    ```csharp
+     ./mtk-openwrt_25.12_build.sh
+	 ```
 
 ## **Filogic 880/850 WiFi7 4.3 Alpha Release (2025-12-31)**
 > [!WARNING]
@@ -62,18 +69,16 @@ To check MediaTek patches releases - https://git01.mediatek.com/plugins/gitiles/
 
 To check OpenWrt patches releases - https://git.openwrt.org/?p=openwrt/openwrt.git;a=shortlog;h=refs/heads/openwrt-25.12
 
-## **Notes**
-> [!NOTE]
-> 18.01.2026 - Add `bananapi_bpi-r4-sdcard.img.gz` to the build. All images can be found in the `openwrt/bin/targets/mediatek/filogic` folder.
+# $$\color{blue}\large{\textbf{Notes}$$
+
+- 18.01.2026 - Add `bananapi_bpi-r4-sdcard.img.gz` to the build. All images can be found in the `openwrt/bin/targets/mediatek/filogic` folder.
 
 <img width="1193" height="487" alt="OpenWrt_V2" src="https://github.com/user-attachments/assets/0ee26b12-d203-480c-b65c-0b8abbf3128f" />
 
-> [!NOTE]
->Temp removing '999-ppe-29-netfilter-add-xfrm-offload.patch' and 3 other related patches to fix compile error 'struct dst_entry has no member named xfrm'. This patch tries to add code that accesses dst->xfrm. Since OpenWrt 25.12 (Kernel 6.12) has removed or currently refactored that member from the kernel structure, applying this patch breaks the networking stack compilation.
+- Temp removing '999-ppe-29-netfilter-add-xfrm-offload.patch' and 3 other related patches to fix compile error 'struct dst_entry has no member named xfrm'. This patch tries to add code that accesses dst->xfrm. Since OpenWrt 25.12 (Kernel 6.12) has removed or currently refactored that member from the kernel structure, applying this patch breaks the networking stack compilation.
 
-> [!NOTE]
->To adjust the tx power values you also need to add sku_idx '0' to your wireless config
-```
+- To adjust the tx power values you also need to add sku_idx '0' to your wireless config
+```csharp
 config wifi-device 'radio0'
 
  * option sku_idx '0'
