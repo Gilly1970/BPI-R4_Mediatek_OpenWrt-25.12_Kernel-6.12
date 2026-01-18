@@ -43,7 +43,7 @@ u-boot-tools dos2unix
 	 ```
      
    * Execute the script: 
-    ```csharp
+     ```csharp
      ./mtk-openwrt_25.12_build.sh
 	 ```
 
