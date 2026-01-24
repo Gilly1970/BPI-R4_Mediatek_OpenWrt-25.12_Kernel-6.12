@@ -6,7 +6,7 @@
 set -euo pipefail
 
 # --- Main Configuration ---
-readonly OPENWRT_REPO="https://git.openwrt.org/openwrt/openwrt.git"
+readonly OPENWRT_REPO="https://github.com/openwrt/openwrt.git"
 #readonly OPENWRT_REPO="/home/user/repo/openwrt"
 readonly OPENWRT_BRANCH="openwrt-25.12"
 readonly OPENWRT_COMMIT="" 
