@@ -71,6 +71,18 @@ To check OpenWrt patches releases - https://git.openwrt.org/?p=openwrt/openwrt.g
 
 # $$\color{blue}\large{\textbf{Notes}}$$
 
+- 2.01.202 - Added updated eeprom containing zeros patch ```0138-mtk-mt76-eeprom-linked-fix.patch```. 
+  - 2GHz and 5GHz: Check for missing (0x00) or uninitialized (0xFF) data. 
+  - If 2G/5G are valid, we assume this is a "Type A" card that is handled correctly by the standard driver logic. 
+  - If 2G/5G are invalid, we assume this is a "Type B" card wiht the corrupt eeprom which is the target of this patch.
+  
+  ```
+  bash
+  dmesg | grep mt7``` 
+  
+  and look for the below message... (if you dont see this message then you have type A card and the patch hasn't applied)
+  ```[   11.316363] mt7996e 0000:01:00.0: Corrupted EEPROM detected (Type B). Restoring all bands to safe```
+
 - 18.01.2026 - Add `bananapi_bpi-r4-sdcard.img.gz` to the build. All images can be found in the `openwrt/bin/targets/mediatek/filogic` folder.
 
 <img width="1193" height="487" alt="OpenWrt_V2" src="https://github.com/user-attachments/assets/0ee26b12-d203-480c-b65c-0b8abbf3128f" />
