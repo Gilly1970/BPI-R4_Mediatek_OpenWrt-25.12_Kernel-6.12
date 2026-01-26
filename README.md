@@ -83,7 +83,7 @@ To check OpenWrt patches releases - https://git.openwrt.org/?p=openwrt/openwrt.g
   
   and look for the below message... (if you dont see this message then you have type A card and the patch hasn't applied)
   ```
-  [   11.316363] mt7996e 0000:01:00.0: Corrupted EEPROM detected (Type B). Restoring all bands to safe
+  [   11.316363] mt7996e 0000:01:00.0: Corrupted EEPROM detected (Type B). Restoring all bands to safe defaults.
   ```
 
 - 18.01.2026 - Add `bananapi_bpi-r4-sdcard.img.gz` to the build. All images can be found in the `openwrt/bin/targets/mediatek/filogic` folder.
