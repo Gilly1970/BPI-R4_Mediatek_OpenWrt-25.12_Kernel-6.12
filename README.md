@@ -81,7 +81,7 @@ To check OpenWrt patches releases - https://git.openwrt.org/?p=openwrt/openwrt.g
   dmesg | grep mt7
   ```  
   
-  and look for the below message... (if you dont see this message then you have type A card and the patch hasn't applied)
+  - and look for the below message... (if you dont see this message then you have type A card and the patch hasn't applied)
   ```
   [   11.316363] mt7996e 0000:01:00.0: Corrupted EEPROM detected (Type B). Restoring all bands to safe defaults.
   ```
