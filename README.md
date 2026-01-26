@@ -71,10 +71,10 @@ To check OpenWrt patches releases - https://git.openwrt.org/?p=openwrt/openwrt.g
 
 # $$\color{blue}\large{\textbf{Notes}}$$
 
-- 2.01.202 - Added updated eeprom containing zeros patch ```0138-mtk-mt76-eeprom-linked-fix.patch```. 
+- 26.01.202 - Added updated eeprom containing zeros patch ```0138-mtk-mt76-eeprom-linked-fix.patch```. 
   - 2GHz and 5GHz: Check for missing (0x00) or uninitialized (0xFF) data. 
   - If 2G/5G are valid, we assume this is a "Type A" card that is handled correctly by the standard driver logic. 
-  - If 2G/5G are invalid, we assume this is a "Type B" card wiht the corrupt eeprom which is the target of this patch.
+  - If 2G/5G are invalid, we assume this is a "Type B" card with the corrupt eeprom which is the target of this patch.
   
   ```
   bash
