@@ -71,6 +71,8 @@ To check OpenWrt patches releases - https://git.openwrt.org/?p=openwrt/openwrt.g
 
 # $$\color{blue}\large{\textbf{Notes}}$$
 
+- 29.01.202 - The latest bunch of mt76 backport patches just released are now causing the build to fail so we will need to wait for MTK to resolve.
+
 - 26.01.202 - Added updated eeprom containing zeros patch ```0138-mtk-mt76-eeprom-linked-fix.patch```. 
   - 2GHz and 5GHz: Check for missing (0x00) or uninitialized (0xFF) data. 
   - If 2G/5G are valid, we assume this is a "Type A" card that is handled correctly by the standard driver logic. 
