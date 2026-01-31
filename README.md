@@ -71,7 +71,19 @@ To check OpenWrt patches releases - https://git.openwrt.org/?p=openwrt/openwrt.g
 
 # $$\color{blue}\large{\textbf{Notes}}$$
 
-- 29.01.202 - The latest bunch of mt76 backport patches just released are now causing the build to fail so we will need to wait for MTK to resolve.
+- 31.01.2026 - Add Git tuning to the script to increase buffer size and increase timeout limits to try help prevent RPC/GnuTLS errors etc.
+
+  ```csharp
+   Updating feed 'packages' from 'https://git.openwrt.org/feed/packages.git^ae0108fa7516aec32b22a8a4934fe62689ec287b' ...
+   Cloning into './feeds/packages'...
+   error: RPC failed; curl 56 GnuTLS recv error (-9): Error decoding the received TLS packet.
+   fetch-pack: unexpected disconnect while reading sideband packet
+   fatal: early EOF
+   fatal: fetch-pack: invalid index-pack output
+   failed.
+   Updating feed 'luci' from 'https://git.openwrt.org/project/luci.git^cc3c97662107c35353d658f1a5a61f30483e437e' ...
+   Cloning into './feeds/luci'..
+   ```
 
 - 26.01.202 - Added updated eeprom containing zeros patch ```0138-mtk-mt76-eeprom-linked-fix.patch```. 
   - 2GHz and 5GHz: Check for missing (0x00) or uninitialized (0xFF) data. 
