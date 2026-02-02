@@ -71,6 +71,9 @@ To check OpenWrt patches releases - https://git.openwrt.org/?p=openwrt/openwrt.g
 
 # $$\color{blue}\large{\textbf{Notes}}$$
 
+- 02.02.2026 - Temp patched the `openwrt_helpers.sh` file to replce 'https:' with 'git:' during the update feeds process.. Changing to git: helps with all the curent errors coming from https://git.openwrt.org the last week or so.
+  - If you don't need it just remove `autobuild/unified/scripts/openwrt_helpers.sh` from the `mtk-add-patch` file.
+
 - 31.01.2026 - Add Git tuning to the script to increase buffer size and increase timeout limits to try help prevent RPC/GnuTLS errors etc.
 
   ```csharp
