@@ -59,14 +59,6 @@ check_dependencies() {
     log "All dependencies met."
 }
 
-configure_git_network() {
-    log "--- Tuning Git Network Settings ---"
-    git config --global http.postBuffer 524288000
-    git config --global http.lowSpeedLimit 0
-    git config --global http.lowSpeedTime 999999
-    log "Git buffers increased."
-}
-
 get_latest_commit_hash() {
     local repo_url=$1
     local branch=$2
@@ -237,8 +229,6 @@ prompt_for_custom_build() {
 
 main() {
     check_dependencies
-	
-    configure_git_network
     
     openwrt_commit=$( [ -n "$OPENWRT_COMMIT" ] && echo "$OPENWRT_COMMIT" || get_latest_commit_hash "$OPENWRT_REPO" "$OPENWRT_BRANCH" )
     setup_repo "$OPENWRT_REPO" "$OPENWRT_BRANCH" "$openwrt_commit" "$OPENWRT_DIR" "OpenWrt"
@@ -273,8 +263,26 @@ main() {
         sed -i 's/\${.*_rfb.*}_nic_set=yes/true/' "$AUTOBUILD_SCRIPT" || true
     fi
 
-    log "--- Forcing Fresh Feed State ---"
-    rm -rf "$OPENWRT_DIR/feeds" "$OPENWRT_DIR/package/feeds"
+    # --- Refined Feed Management ---
+    log "--- Updating and Installing Feeds ---"
+    (
+        cd "$OPENWRT_DIR"
+		
+		 log "Applying protocol fixes to feeds.conf.default..."
+        sed -i 's|https://git.openwrt.org|git://git.openwrt.org|g' feeds.conf.default
+        sed -i '/video/s|git://|https://|g' feeds.conf.default
+
+        # 1. Update the feed indexes with a retry loop for network stability
+        for i in {1..3}; do
+            log "  - Feed update attempt $i..."
+            ./scripts/feeds update -a && break || {
+                log "  - Attempt $i failed. Retrying in 15s..."
+                sleep 15
+            }
+        done
+
+        ./scripts/feeds install -a
+    )
 
     log "--- Cleaning Autobuild Cache ---"
     (
