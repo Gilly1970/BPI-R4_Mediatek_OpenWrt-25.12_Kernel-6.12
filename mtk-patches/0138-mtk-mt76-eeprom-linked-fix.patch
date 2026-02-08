@@ -1,16 +1,16 @@
-From f4f2da5469d6c9822d5395adccf5a33627a8de31 Mon Sep 17 00:00:00 2001
-Date: Mon, 19 Jan 2026 15:02:03 +1000
-Subject: [PATCH] 0138-mtk-mt76-eeprom-linked-fix
+From d2107b4ca6d986ca7787c4d3308310c3fd44a617 Mon Sep 17 00:00:00 2001
+Date: Tue, 13 Jan 2026 18:27:32 +1000
+Subject: [PATCH] 0135-mtk-mt76-mt7996-fix-25.12-EEPROM-0s
 
 ---
- mt7996/eeprom.c | 39 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 39 insertions(+)
+ mt7996/eeprom.c | 40 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
 
 diff --git a/mt7996/eeprom.c b/mt7996/eeprom.c
-index e5fbfe7..989452d 100644
+index e5fbfe7..fe4f8b8 100644
 --- a/mt7996/eeprom.c
 +++ b/mt7996/eeprom.c
-@@ -171,6 +171,43 @@ mt7996_eeprom_parse_stream(const u8 *eeprom, u8 band_idx, u8 *path,
+@@ -171,6 +171,44 @@ mt7996_eeprom_parse_stream(const u8 *eeprom, u8 band_idx, u8 *path,
  	}
  }
  
@@ -19,42 +19,43 @@ index e5fbfe7..989452d 100644
 +{
 +	u8 *eeprom = dev->mt76.eeprom.data;
 +	int i;
-+	bool broken_eeprom = false;
++	bool zeros_detected = false;
++	bool sixg_overridden = false;
 +
-+	/* +	 * 2.4GHz: Check for missing (0x00) or uninitialized (0xFF) data.
-+	 */
-+	if (eeprom[MT_EE_TX0_POWER_2G] == 0 || eeprom[MT_EE_TX0_POWER_2G] == 0xff) {
++	if (!eeprom[MT_EE_TX0_POWER_2G]) {
 +		eeprom[MT_EE_TX0_POWER_2G] = def[MT_EE_TX0_POWER_2G];
-+		broken_eeprom = true;
++		zeros_detected = true;
 +	}
 +
-+	/* +	 * 5GHz: Check for missing (0x00) or uninitialized (0xFF) data.
-+	 */
 +	for (i = MT_EE_TX0_POWER_5G; i < MT_EE_TX0_POWER_5G + 5; ++i) {
-+		if (eeprom[i] == 0 || eeprom[i] == 0xff) {
++		if (!eeprom[i]) {
 +			eeprom[i] = def[i];
-+			broken_eeprom = true;
++			zeros_detected = true;
 +		}
 +	}
 +
-+	/* +	 * 6GHz: Only override if the EEPROM is confirmed to be corrupted 
-+	 * (based on the lower bands being bad).
-+	 * If 2G/5G are valid, we assume this is a "Type A" board that 
-+	 * is handled correctly by the standard driver logic.
++	/*
++	 * Unconditionally use default firmware values for the 6GHz band.
++	 * This is a workaround for hardware with incorrect (but non-zero)
++	 * tx_power values in the EEPROM.
 +	 */
-+	if (broken_eeprom) {
-+		for (i = MT_EE_TX0_POWER_6G; i < MT_EE_TX0_POWER_6G + 8; ++i) {
-+			if (eeprom[i] != def[i])
-+				eeprom[i] = def[i];
++	for (i = MT_EE_TX0_POWER_6G; i < MT_EE_TX0_POWER_6G + 8; ++i) {
++		if (eeprom[i] != def[i]) {
++			eeprom[i] = def[i];
++			sixg_overridden = true;
 +		}
-+		dev_warn(dev->mt76.dev, "Corrupted EEPROM detected (Type B). Restoring all bands to safe defaults.\n");
 +	}
++
++	if (zeros_detected)
++		dev_warn(dev->mt76.dev, "eeprom tx_power zeros detected, using defaults\n");
++	if (sixg_overridden)
++		dev_warn(dev->mt76.dev, "Overriding 6GHz eeprom tx_power with firmware defaults\n");
 +}
 +
  static bool mt7996_eeprom_variant_valid(struct mt7996_dev *dev, const u8 *def)
  {
  #define FEM_INT	0
-@@ -226,6 +263,8 @@ mt7996_eeprom_check_or_use_default(struct mt7996_dev *dev, bool use_default)
+@@ -226,6 +264,8 @@ mt7996_eeprom_check_or_use_default(struct mt7996_dev *dev, bool use_default)
  		goto out;
  	}
  
