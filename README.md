@@ -71,48 +71,12 @@ To check OpenWrt patches releases - https://git.openwrt.org/?p=openwrt/openwrt.g
 
 # $$\color{blue}\large{\textbf{Notes}}$$
 
+- 11.02.2026 - Added new eeprom containing zeros patch ```0140-wifi-mt76-mt7996-use-mt76_get_txpower_cur.patch```.
+
+  - I've had to rebuild the patch from the ground up to make it work again with the current MTK-feeds. However, it does need a lot more work due to all the recent wifi-mt76 driver changes in kernel-6.12. In particular the removal of the `mt7996_get_txpower` function which all the old eeprom containing zero patches relied on to work.
+  
+  - This patch is a work in progress and in its current state will allow you to change the default tx power levels on all radios as long as you have `option sku_idx '0'` in your wireless config. When the image is first installed you might see the default levels still showing very low on the 2 Ghz & 6 Ghz bands.. Once you manually toggle to the desired tx power level e.g. `23 dBm` and save, your should see the correctly defaults show for your region.
+
 - 02.02.2026 - Temp patched the `openwrt_helpers.sh` file to replce 'https:' with 'git:' during the update feeds process.. Changing to git: helps with all the curent errors coming from https://git.openwrt.org the last week or so.
   - If you don't need it just remove `autobuild/unified/scripts/openwrt_helpers.sh` from the `mtk-add-patch` file.
 
-- 31.01.2026 - Add Git tuning to the script to increase buffer size and increase timeout limits to try help prevent RPC/GnuTLS errors etc.
-
-  ```csharp
-   Updating feed 'packages' from 'https://git.openwrt.org/feed/packages.git^ae0108fa7516aec32b22a8a4934fe62689ec287b' ...
-   Cloning into './feeds/packages'...
-   error: RPC failed; curl 56 GnuTLS recv error (-9): Error decoding the received TLS packet.
-   fetch-pack: unexpected disconnect while reading sideband packet
-   fatal: early EOF
-   fatal: fetch-pack: invalid index-pack output
-   failed.
-   Updating feed 'luci' from 'https://git.openwrt.org/project/luci.git^cc3c97662107c35353d658f1a5a61f30483e437e' ...
-   Cloning into './feeds/luci'..
-   ```
-
-- 26.01.202 - Added updated eeprom containing zeros patch ```0138-mtk-mt76-eeprom-linked-fix.patch```. 
-  - 2GHz and 5GHz: Check for missing (0x00) or uninitialized (0xFF) data. 
-  - If 2G/5G are valid, we assume this is a "Type A" card that is handled correctly by the standard driver logic. 
-  - If 2G/5G are invalid, we assume this is a "Type B" card with the corrupt eeprom which is the target of this patch.
-  
-  ```csharp
-  bash
-  dmesg | grep mt7
-  ```  
-  
-  - and look for the below message in the log...
-  
-  ```csharp
-  [   11.316363] mt7996e 0000:01:00.0: Corrupted EEPROM detected (Type B). Restoring all bands to safe defaults.
-  ```
-  - If you dont see this message in the log then you have type A card and the patch has not applied.
-  
-
-- 18.01.2026 - Add `bananapi_bpi-r4-sdcard.img.gz` to the build. All images can be found in the `openwrt/bin/targets/mediatek/filogic` folder.
-
-<img width="1193" height="487" alt="OpenWrt_V2" src="https://github.com/user-attachments/assets/0ee26b12-d203-480c-b65c-0b8abbf3128f" />
-
-- To adjust the tx power values you also need to add sku_idx '0' to your wireless config
-     ```csharp
-     config wifi-device 'radio0'
-     
-         option sku_idx '0'
-     ```
