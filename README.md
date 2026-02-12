@@ -8,7 +8,7 @@ Script to Build (Openwrt 25.12/kernel 6.12) with the mtk-openwrt-feeds...
 
 2. If you want to target a specific commit use the full commit hash e.g... OPENWRT_COMMIT="2acfd9f8ab12e4f353a0aa644d9adf89588b1f0f"
 
-3. Error Checks - All scripts and patches will be auto chacked with dos2unix and corrected if needed if they are not in the correct EOL format.
+3. Error Checks - All scripts and patches will be auto checked with dos2unix and corrected if needed if they are not in the correct EOL format.
 
 ## Compile Environment Requirement
 
