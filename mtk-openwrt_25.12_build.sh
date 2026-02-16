@@ -6,15 +6,15 @@
 set -euo pipefail
 
 # --- Main Configuration ---
-readonly OPENWRT_REPO="https://git.openwrt.org/openwrt/openwrt.git"
+readonly OPENWRT_REPO="https://github.com/openwrt/openwrt.git"
 #readonly OPENWRT_REPO="/home/user/repo/openwrt"
 readonly OPENWRT_BRANCH="openwrt-25.12"
-readonly OPENWRT_COMMIT="" 
+readonly OPENWRT_COMMIT="b7c9051debc45730003876bf83e540bed8de1aa1" 
 
 readonly MTK_FEEDS_REPO="https://git01.mediatek.com/openwrt/feeds/mtk-openwrt-feeds"
 #readonly MTK_FEEDS_REPO="/home/user/repo/mtk-openwrt-feeds"
 readonly MTK_FEEDS_BRANCH="master"
-readonly MTK_FEEDS_COMMIT="0510740e449204df4891a8049f47847604142ae3" 
+readonly MTK_FEEDS_COMMIT="" 
 
 # --- Directory Configuration ---
 readonly SOURCE_DEFAULT_CONFIG_DIR="config"
@@ -103,16 +103,27 @@ remove_files_from_list() {
 }
 
 apply_files_from_list() {
-    local list_file=$1
-    local source_dir=$2
-    local target_dir=$3
+    local list_file="$1"
+    local source_dir="$2"
+    local target_dir="$3"
+
     if [ ! -f "$list_file" ]; then
         log "Warning: List file '$list_file' not found. Skipping."
         return
     fi
-    log "--- Applying patches from '$list_file' to '$target_dir' ---"
+
+    # Convert to absolute paths to prevent directory nesting bugs
+    local abs_source_dir
+    local abs_target_dir
+    abs_source_dir=$(realpath "$source_dir")
+    abs_target_dir=$(realpath "$target_dir")
+
+    log "--- Applying patches from '$list_file' to '$abs_target_dir' ---"
+
     while IFS= read -r line; do
+        # Skip comments and empty lines
         [[ "$line" =~ ^\s*# ]] || [ -z "$line" ] && continue
+
         local src dest
         if [[ "$line" == *":"* ]]; then
             src=$(echo "$line" | cut -d':' -f1 | tr -d '[:space:]')
@@ -121,12 +132,23 @@ apply_files_from_list() {
             dest=$(echo "$line" | tr -d '[:space:]' | sed 's|^/||')
             src=$(basename "$dest")
         fi
-        if [ ! -f "$source_dir/$src" ]; then
-            log "ERROR: Source file '$src' missing in '$source_dir'. Cannot copy to '$dest'."
+
+        # Safety Check: Ensure we aren't trying to copy the source directory itself
+        if [ "$src" == "." ] || [ "$src" == ".." ]; then
+            log "  [Skip] Invalid source reference in $list_file: $src"
             continue
         fi
-        mkdir -p "$(dirname "$target_dir/$dest")"
-        cp "$source_dir/$src" "$target_dir/$dest"
+
+        if [ ! -f "$abs_source_dir/$src" ]; then
+            log "ERROR: Source file '$src' missing in '$abs_source_dir'."
+            continue
+        fi
+
+        # Ensure the destination parent directory exists
+        mkdir -p "$(dirname "$abs_target_dir/$dest")"
+
+        # Use -T to treat destination as a file, preventing nesting if 'dest' is a dir
+        cp -af "$abs_source_dir/$src" "$abs_target_dir/$dest"
         log "  [Copy] $src -> $dest"
     done < <(grep -v -E '^\s*#|^\s*$' "$list_file")
 }
@@ -264,24 +286,14 @@ main() {
     fi
 
     # --- Refined Feed Management ---
-    log "--- Updating and Installing Feeds ---"
+    log "--- Applying Protocol Fixes ---"
     (
         cd "$OPENWRT_DIR"
-		
-		 log "Applying protocol fixes to feeds.conf.default..."
+        
+        log "Applying protocol fixes to feeds.conf.default..."
         sed -i 's|https://git.openwrt.org|git://git.openwrt.org|g' feeds.conf.default
         sed -i '/video/s|git://|https://|g' feeds.conf.default
 
-        # 1. Update the feed indexes with a retry loop for network stability
-        for i in {1..3}; do
-            log "  - Feed update attempt $i..."
-            ./scripts/feeds update -a && break || {
-                log "  - Attempt $i failed. Retrying in 15s..."
-                sleep 15
-            }
-        done
-
-        ./scripts/feeds install -a
     )
 
     log "--- Cleaning Autobuild Cache ---"
@@ -293,7 +305,7 @@ main() {
     log "--- Starting Full Autobuild (Prepare & Build) ---"
     (
         cd "$OPENWRT_DIR"
-        bash "../$MTK_FEEDS_DIR/autobuild/unified/autobuild.sh" "$BUILD_PROFILE" filogic log_file=make
+        bash "../$MTK_FEEDS_DIR/autobuild/unified/autobuild.sh" "$BUILD_PROFILE" filogic log_file=make skip_feeds=yes
     )
 
     rename_release_images
