@@ -71,12 +71,12 @@ To check OpenWrt patches releases - https://git.openwrt.org/?p=openwrt/openwrt.g
 
 # $$\color{blue}\large{\textbf{Notes}}$$
 
-- 11.02.2026 - Added new eeprom containing zeros patch ```0140-wifi-mt76-mt7996-use-mt76_get_txpower_cur.patch```.
-
-  - I've had to rebuild the patch from the ground up to make it work again with the current MTK-feeds. However, it does need a lot more work due to all the recent wifi-mt76 driver changes in kernel-6.12. In particular the removal of the `mt7996_get_txpower` function which all the old eeprom containing zero patches relied on to work.
-  
-  - This patch is a work in progress and in its current state will allow you to change the default tx power levels on all radios as long as you have `option sku_idx '0'` in your wireless config. When the image is first installed you might see the default levels still showing very low on the 2 Ghz & 6 Ghz bands.. Once you manually toggle to the desired tx power level e.g. `23 dBm` and save, your should see the correctly defaults show for your region.
-
-- 02.02.2026 - Temp patched the `openwrt_helpers.sh` file to replce 'https:' with 'git:' during the update feeds process.. Changing to git: helps with all the curent errors coming from https://git.openwrt.org the last week or so.
-  - If you don't need it just remove `autobuild/unified/scripts/openwrt_helpers.sh` from the `mtk-add-patch` file.
+ - 20.02.202 - Added 0145-mtk-new_tx_power_check.patch
+ 
+    - This is the final patch for the BE14 card that I will be adding to the repo. After a long battle with driver 
+	  issues and zeroed EEPROMs in the hopes of a Sinovoip-led solution, I’m calling it.
+	  
+	  The hardware is fundamentally flawed—burdened by excessive noise and poor signal quality. The chances of a 
+	  fix via new firmware at this stage are slim to none, and Slim just left town. I am officially dropping my BE14
+	  card into the recycling bin and will be focused on more reputable hardware that I've purchased as a replacement.
 
