@@ -71,7 +71,14 @@ To check OpenWrt patches releases - https://git.openwrt.org/?p=openwrt/openwrt.g
 
 # $$\color{blue}\large{\textbf{Notes}}$$
 
- - 20.02.202 - Added 0145-mtk-new_tx_power_check.patch
+ - 24.02.2026 - Removed the commits in the script again so it is now pulling from the latest again.
+ 
+	 - MTK have updated with another [fix patches](https://git01.mediatek.com/plugins/gitiles/openwrt/feeds/mtk-openwrt-feeds/+/ff9029576c3c07cdeed9dda8de7f8e9d8f996dcd) which caused the latest round of build conflicts.
+	   If the build breaks agian due to patch conflicts just set the mtk & openwrt to the last commits before
+	   the build fail and wait for MTK to release another fix before opening it up again. I will no longer
+	   be making any more changes to this repo as I have moved away from the BPI-R4 platform completly.
+
+ - 20.02.2026 - Added 0145-mtk-new_tx_power_check.patch
  
     - This is the final patch for the BE14 card that I will be adding to the repo. After a long battle with driver 
 	  issues and zeroed EEPROMs in the hopes of a Sinovoip-led solution, I’m calling it.
